@@ -18,6 +18,8 @@
  ******************************************************************************/
 package net.continuumsecurity.burpclient;
 
+import org.apache.log4j.PropertyConfigurator;
+
 import groovy.ui.Console;
 
 
@@ -30,6 +32,7 @@ public class BurpShell {
 	}
 
 	public static void main(String... args) {
+		PropertyConfigurator.configure("log4j.properties");
 		BurpShell c = new BurpShell();
 		c.run();
 	}

@@ -113,13 +113,6 @@ public class BurpClient {
         client.destroy();
     }
 
-    public static void main(String... args) throws Exception {
-        PropertyConfigurator.configure("log4j.properties");
-        BurpClient bc = new BurpClient("http://localhost:8181/");
-        bc.reset();
-        bc.destroy();
-    }
-
     private Client createClient(String proxyHost, int proxyPort) {
         final DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
         if (!"".equals(proxyHost) && (proxyPort != 0)) {

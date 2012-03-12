@@ -1,25 +1,4 @@
-/*******************************************************************************
- * BDD-Security, application security testing framework
- * 
- * Copyright (C) `2012 Stephen de Vries`
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see `<http://www.gnu.org/licenses/>`.
- ******************************************************************************/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package net.continuumsecurity.restyburp;
 
 import java.net.MalformedURLException;
@@ -28,21 +7,41 @@ import java.util.Map;
 import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
 
-/**
- *
- * @author stephen
- */
+ 
+ 
+
 public interface IBurpService {
+	 
+	//  Scan a given URL.  Will scan based on the traffic already captured by burp.
     int scan(String target) throws MalformedURLException;   
-    //0-100%
+     
+    //  Returns 0-100 depending on the completion of a scan
     int getPercentageComplete(int scanId);   
+     
+    // Returns a list of ScanIssueBean's that represent the issues found so far for a given scan ID. 
     List<ScanIssueBean> getIssues(int scanId); 
+     
+    // Return the whole proxy history.
     List<HttpRequestResponseBean> getProxyHistory();
+     
+    // Return only the proxy history that matches the given URL. 
     List<HttpRequestResponseBean> getProxyHistory(String url) throws Exception;
+     
+    // Restore Burp's state with that specified in the blank.burp.state file.
     void reset() throws Exception;
+     
+    // Return the current configuration.
     Map<String,String> getConfig();
+     
+    // Replace the current configuration with the specified one.
     void setConfig(Map<String,String> newConfig);
+     
+    // Keep the current configuration and only update those items provided.
     void updateConfig(Map<String,String> newConfig);
+      
+    // Save the current config to a file
     void saveConfig(String filename);
+     
+    // Load the configuration from a file.
     void loadConfig(String filename);
 }

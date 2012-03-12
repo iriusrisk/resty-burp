@@ -22,10 +22,6 @@
  */
 package net.continuumsecurity.restyburp;
 
-import burp.BurpExtender;
-import burp.IHttpRequestResponse;
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,12 +33,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
+
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
+import burp.BurpExtender;
+import burp.IHttpRequestResponse;
+
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 /**
  *
@@ -65,7 +69,6 @@ public class BurpService implements IBurpService {
         System.setProperty("java.awt.headless", Boolean.toString(headless));
         burp.StartBurp.main(new String[0]);
         extender = BurpExtender.getInstance();
-        
         Map<String,String> config = new HashMap<String,String>();
         config.put("proxy.interceptrequests","false");
         updateConfig(config);
@@ -273,7 +276,6 @@ public class BurpService implements IBurpService {
         }
         
         BurpService bs = BurpService.getInstance();
-        bs.startRESTServer();
         
         if (options.has("f")) {
             if (options.hasArgument("f")) {
@@ -282,5 +284,7 @@ public class BurpService implements IBurpService {
                 bs.loadConfig("burp.config");
             }
         }
+        
+        bs.startRESTServer();
     }
 }

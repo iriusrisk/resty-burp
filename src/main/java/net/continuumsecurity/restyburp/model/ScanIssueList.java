@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public class ScanIssueList {
     private List<ScanIssueBean> issues;
     
-    @XmlElementWrapper(name = "issues")
+    @XmlElementWrapper(name = "issue")
     public List<ScanIssueBean> getIssues() {
         return issues;
     }
