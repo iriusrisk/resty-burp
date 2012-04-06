@@ -25,6 +25,8 @@ package net.continuumsecurity.restyburp.model;
 import burp.IHttpRequestResponse;
 import burp.IScanIssue;
 import java.net.URL;
+
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -238,6 +240,7 @@ public class ScanIssueBean implements IScanIssue {
     /**
      * @return the httpMessages
      */
+    @XmlElementWrapper(name = "httpMessage")
     public HttpRequestResponseBean[] getHttpMessages() {
         return httpMessages;
     }

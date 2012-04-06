@@ -22,10 +22,11 @@
  */
 package net.continuumsecurity.restyburp.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -33,9 +34,9 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlRootElement
 public class ScanIssueList {
-    private List<ScanIssueBean> issues;
+    private List<ScanIssueBean> issues = new ArrayList<ScanIssueBean>();
     
-    @XmlElementWrapper(name = "issue")
+    @XmlElementWrapper(name = "list")
     public List<ScanIssueBean> getIssues() {
         return issues;
     }
