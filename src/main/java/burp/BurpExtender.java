@@ -36,7 +36,6 @@ public class BurpExtender implements IBurpExtender {
 
     //Wait for the instance to be initialised
     public static BurpExtender getInstance() {
-        log.debug("Setting running to true in Extender");
         return instance;
     }
     // Called to handle command line arguments passed to Burp
@@ -70,14 +69,19 @@ public class BurpExtender implements IBurpExtender {
     public ScanQueueMap scan(String baseUrl) {
         log.debug("Attempting to scan all: " + baseUrl);
         ScanQueueMap map = new ScanQueueMap();
-
+ 
         for (IHttpRequestResponse rr : callbacks.getProxyHistory()) {
             try {
                 URL url = new URL(baseUrl);
                 if (Utils.containsUrl(rr.getUrl(), url) && !outOfScope.contains(rr.getUrl()) && !map.hasUrl(rr.getUrl().toExternalForm())) {
                     log.debug("Adding " + rr.getUrl() + " to scope.");
-                    if (!callbacks.isInScope(rr.getUrl())) callbacks.includeInScope(rr.getUrl());
+                    
+                    if (!callbacks.isInScope(rr.getUrl())) {
+                    	callbacks.includeInScope(rr.getUrl());
+                    	log.debug("\tcallbacks.isInScope("+rr.getUrl()+") is "+callbacks.isInScope(rr.getUrl()));
+                    }              
                     boolean useHttps = rr.getProtocol().equalsIgnoreCase("https");
+                    log.debug("\tabout to scan: "+rr.getHost()+" "+rr.getPort()+" "+rr.getUrl());
                     IScanQueueItem isq = callbacks.doActiveScan(rr.getHost(), rr.getPort(), useHttps, rr.getRequest());
                     map.addItem(rr.getUrl().toExternalForm(), isq);
                 }

@@ -7,7 +7,6 @@
     <artifactId>resty-burp</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>resty-burp</name>
     <url>http://maven.apache.org</url>
 
@@ -33,9 +32,9 @@
             <version>1.2.16</version>
         </dependency>
         <dependency>
-            <groupId>portswigger.net</groupId>
+            <groupId>net.portswigger</groupId>
             <artifactId>burpsuite-pro</artifactId>
-            <version>1.4.04</version>
+            <version>1.4.05</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
@@ -103,8 +102,6 @@
                 <configuration>  
                     <mainClass>net.continuumsecurity.restyburp.BurpService</mainClass>  
                 </configuration>
-                
-               
             </plugin>
         </plugins>
     </build>

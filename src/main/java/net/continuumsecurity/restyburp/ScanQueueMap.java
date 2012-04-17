@@ -59,10 +59,10 @@ public class ScanQueueMap {
     public boolean hasUrl(String url) {
         log.debug(" Checking whether map.hasUrl("+url+")");
         for (String theUrl : map.keySet()) {
-            log.debug("  found: "+theUrl);
+            log.trace("  found: "+theUrl);
             if (theUrl.equalsIgnoreCase(url)) return true;
         }
-        log.debug(" Not found.");
+        log.trace(" Not found.");
         return false;
     }
     

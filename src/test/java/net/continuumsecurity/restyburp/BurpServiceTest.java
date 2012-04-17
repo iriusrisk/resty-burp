@@ -37,8 +37,7 @@ public class BurpServiceTest {
     HtmlUnitDriver driver;
     static IBurpService burp;
     Settings settings;
-    final String target = "http://localhost:8081/ispatula/";
-    final String target2 = "http://localhost:8081/ispatula/shop/index.do";
+    final String target = "http://localhost:9110/ropeytasks/user/login";
     int proxyPort = 8080;
 
     public BurpServiceTest() {
@@ -75,10 +74,7 @@ public class BurpServiceTest {
     public void testScanQueue() throws Exception {
         ScanQueueMap sq;
         driver.get(target);
-        driver.get(target2);
-        driver.findElementByName("query").sendKeys("hello");
-        driver.findElementByXPath("//input[@src='../images/search.gif']").click();
-        int scanId = burp.scan("http://localhost:8081/ispatula/shop/Search.do");
+        int scanId = burp.scan(target);
         log.debug(">>> New scan with scanID="+scanId);
         while (burp.getPercentageComplete(scanId) < 100) {
             log.debug("Complete: "+burp.getPercentageComplete(scanId));
