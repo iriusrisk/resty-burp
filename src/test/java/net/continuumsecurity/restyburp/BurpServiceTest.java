@@ -22,11 +22,14 @@
  */
 package net.continuumsecurity.restyburp;
 
+import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 /*
@@ -37,7 +40,7 @@ public class BurpServiceTest {
     HtmlUnitDriver driver;
     static IBurpService burp;
     Settings settings;
-    final String target = "http://localhost:9110/ropeytasks/user/login";
+    final String target = "http://localhost:9110/ropeytasks/";
     int proxyPort = 8080;
 
     public BurpServiceTest() {
@@ -51,24 +54,32 @@ public class BurpServiceTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    	log.debug("Test case done.");
     }
 
     @Before
     public void setUp() {
         driver = new HtmlUnitDriver();
         driver.setProxy("127.0.0.1", proxyPort);
+        try {
+			burp.reset();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
-    @After
-    public void tearDown() {
-        while (true) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                log.error(ex);
-            }
-        }
+    @Test
+    public void testFindInResponse() {
+    	String regex = ".*password.*";
+    	driver.get(target);
+    	driver.get(target+"user/login");
+    	HttpRequestResponseBean result = burp.findInResponseHistory(regex);
+    	assert (new String(result.getResponse()).contains(regex));
+    	log.debug("Test done");
     }
+    
+   
 
     
     public void testScanQueue() throws Exception {
@@ -88,7 +99,7 @@ public class BurpServiceTest {
             BurpServiceTest bst = new BurpServiceTest();
             setUpClass();
             bst.setUp();
-            bst.testScanQueue();
+            bst.testFindInResponse();
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }

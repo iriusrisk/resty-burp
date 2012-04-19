@@ -44,4 +44,7 @@ public interface IBurpService {
      
     // Load the configuration from a file.
     void loadConfig(String filename);
+    
+    HttpRequestResponseBean findInResponseHistory(String regex);
+    HttpRequestResponseBean findInRequestHistory(String regex);
 }

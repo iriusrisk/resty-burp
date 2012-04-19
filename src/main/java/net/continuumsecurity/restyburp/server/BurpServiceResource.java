@@ -23,7 +23,7 @@
 package net.continuumsecurity.restyburp.server;
 
 import java.net.MalformedURLException;
-import org.apache.log4j.Logger;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -36,11 +36,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
+
 import net.continuumsecurity.restyburp.BurpService;
 import net.continuumsecurity.restyburp.IBurpService;
 import net.continuumsecurity.restyburp.model.Config;
+import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
 import net.continuumsecurity.restyburp.model.ProxyHistoryList;
 import net.continuumsecurity.restyburp.model.ScanIssueList;
+
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -102,6 +106,30 @@ public class BurpServiceResource {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
+    
+    @GET
+    @Path("proxy/history/response/{regex}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpRequestResponseBean searchResponse(@PathParam("regex") String search) {
+        log.debug("Searching for: "+search);
+        try {
+            return (burp.findInResponseHistory(search));
+        } catch (Exception ex) {
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+        } 
+    }
+    
+    @GET
+    @Path("proxy/history/request/{regex}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpRequestResponseBean searchRequest(@PathParam("regex") String search) {
+        log.debug("Searching for: "+search);
+        try {
+            return (burp.findInRequestHistory(search));
+        } catch (Exception ex) {
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+        } 
+    }    
 
     @GET
     @Path("config")

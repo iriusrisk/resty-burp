@@ -34,14 +34,16 @@ public class BurpClient {
     WebResource service;
 
     public BurpClient(String baseUrl) {
+    	PropertyConfigurator.configure("log4j.properties");
         log.debug("Creating Jersey client to: "+baseUrl);
         client = createClient(null,0);
         service = client.resource(UriBuilder.fromUri(baseUrl).build());
     }
     
     public BurpClient(String baseUrl, String proxyHost, int proxyPort) {
-        log.debug("Creating Jersey client to: "+baseUrl);
-
+    	PropertyConfigurator.configure("log4j.properties");
+        log.debug("Creating Jersey client to: "+baseUrl+" with proxy host: "+proxyHost+" and port: "+proxyPort);
+        if (proxyHost.length() == 0) proxyHost = null;
         client = createClient(proxyHost, proxyPort);
         service = client.resource(UriBuilder.fromUri(baseUrl).build());
     }
@@ -71,24 +73,14 @@ public class BurpClient {
         return result.history;
     }
     
-    /*
-     * Matches using the following regex options:
-     * Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE)
-     */
-    public HttpRequestResponseBean findInRequestHistory(String regex) {
-        Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-        for (HttpRequestResponseBean bean : getProxyHistory()) {
-            if (p.matcher(new String(bean.getRequest())).matches()) return bean;
-        }
-        return null;
+    public HttpRequestResponseBean findInResponseHistory(String regex) {
+    	HttpRequestResponseBean result = service.path("proxy").path("history").path("response").path(regex).get(HttpRequestResponseBean.class);
+    	return result;
     }
     
-    public HttpRequestResponseBean findInResponseHistory(String regex) {
-        Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-        for (HttpRequestResponseBean bean : getProxyHistory()) {
-            if (p.matcher(new String(bean.getResponse())).matches()) return bean;
-        }
-        return null;
+    public HttpRequestResponseBean findInRequestHistory(String regex) {
+    	HttpRequestResponseBean result = service.path("proxy").path("history").path("request").path(regex).get(HttpRequestResponseBean.class);
+    	return result;
     }
 
     public Map<String, String> getConfig() {

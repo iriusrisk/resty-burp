@@ -25,14 +25,17 @@ package net.continuumsecurity.restyburp;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -65,6 +68,7 @@ public class BurpService implements IBurpService {
     private static BurpService instance;
 
     private BurpService() {
+    	PropertyConfigurator.configure("log4j.properties");
         log.debug("Creating new burp service");
         System.setProperty("java.awt.headless", Boolean.toString(headless));
         burp.StartBurp.main(new String[0]);
@@ -215,6 +219,58 @@ public class BurpService implements IBurpService {
         }
         return sqm.getIssues();
     }
+    
+    /*
+     * Matches using the following regex options:
+     * Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE)
+     */
+    @Override
+    public HttpRequestResponseBean findInRequestHistory(String regex) {
+    	Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+        for (HttpRequestResponseBean bean : getProxyHistory()) {
+        	String stringBean;
+			try {
+				//TODO read encoding from headers
+				//TODO Bug here, for some long pages (>40 000 BYTES) the matcher hangs.
+				stringBean = new String(bean.getRequest(),"UTF8");
+				log.debug("Searching in request: "+bean.getUrl());
+	            if (p.matcher(stringBean).matches()) {
+	            	log.debug("Found regex: "+regex+" in request: "+bean.getUrl());
+	            	return bean;
+	            }
+			} catch (UnsupportedEncodingException e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			}
+        	
+        }
+        log.debug("Did not find regex: "+regex+" in response history.");
+        return null;
+    }
+    
+    @Override
+    public HttpRequestResponseBean findInResponseHistory(String regex) {
+        Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+        for (HttpRequestResponseBean bean : getProxyHistory()) {
+        	String stringBean;
+			try {
+				//TODO read encoding from headers
+				//TODO Bug here, for some long pages (>40 000 BYTES) the matcher hangs.
+				stringBean = new String(bean.getResponse(),"UTF8");
+				log.debug("Searching in response to: "+bean.getUrl());
+	            if (p.matcher(stringBean).matches()) {
+	            	log.debug("Found regex: "+regex+" in response: "+bean.getUrl());
+	            	return bean;
+	            }
+			} catch (UnsupportedEncodingException e) {
+				log.error(e.getMessage());
+				e.printStackTrace();
+			}
+        	
+        }
+        log.debug("Did not find regex: "+regex+" in response history.");
+        return null;
+    }
 
     @Override
     public List<HttpRequestResponseBean> getProxyHistory() {
@@ -222,6 +278,7 @@ public class BurpService implements IBurpService {
         for (IHttpRequestResponse ihrr : extender.getProxyHistory()) {
             result.add(new HttpRequestResponseBean(ihrr));
         }
+        log.debug("Returning "+result.size()+" request/responses from the proxy history.");
         return result;
     }
 
@@ -265,7 +322,7 @@ public class BurpService implements IBurpService {
     }
 
     public static void main(String... args) {
-        PropertyConfigurator.configure("log4j.properties");
+        
         OptionParser parser = new OptionParser();
         parser.accepts("f").withOptionalArg().ofType(String.class);
         parser.accepts("g");
