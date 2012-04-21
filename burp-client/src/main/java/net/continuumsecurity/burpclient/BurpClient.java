@@ -6,6 +6,7 @@ package net.continuumsecurity.burpclient;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
@@ -17,8 +18,8 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import net.continuumsecurity.restyburp.model.Config;
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
-import net.continuumsecurity.restyburp.model.ProxyHistoryList;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.HttpMessageList;
 import net.continuumsecurity.restyburp.model.ScanIssueList;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -43,7 +44,7 @@ public class BurpClient {
     public BurpClient(String baseUrl, String proxyHost, int proxyPort) {
     	PropertyConfigurator.configure("log4j.properties");
         log.debug("Creating Jersey client to: "+baseUrl+" with proxy host: "+proxyHost+" and port: "+proxyPort);
-        if (proxyHost.length() == 0) proxyHost = null;
+        if (proxyHost != null && proxyHost.length() == 0) proxyHost = null;
         client = createClient(proxyHost, proxyPort);
         service = client.resource(UriBuilder.fromUri(baseUrl).build());
     }
@@ -63,24 +64,33 @@ public class BurpClient {
         return (service.path("scanner").path(Integer.toString(scanId)).path("issues").get(ScanIssueList.class));
     }
 
-    public List<HttpRequestResponseBean> getProxyHistory() {
-        ProxyHistoryList result = service.path("proxy").path("history").get(ProxyHistoryList.class);
-        return result.history;
+    public List<HttpMessage> getProxyHistory() {
+        HttpMessageList result = service.path("proxy").path("history").get(HttpMessageList.class);
+        return result.messages;
     }
 
-    public List<HttpRequestResponseBean> getProxyHistory(String url) throws UnsupportedEncodingException {
-        ProxyHistoryList result = service.path("proxy").path("history").queryParam("url", url).get(ProxyHistoryList.class);
-        return result.history;
+    public List<HttpMessage> getProxyHistory(String url) throws UnsupportedEncodingException {
+        HttpMessageList result = service.path("proxy").path("history").queryParam("url", url).get(HttpMessageList.class);
+        return result.messages;
     }
     
-    public HttpRequestResponseBean findInResponseHistory(String regex) {
-    	HttpRequestResponseBean result = service.path("proxy").path("history").path("response").path(regex).get(HttpRequestResponseBean.class);
-    	return result;
+    public List<HttpMessage> findInResponseHistory(String regex) throws UnsupportedEncodingException {
+    	String query = "regex="+URLEncoder.encode(regex, "UTF-8");
+    	HttpMessageList result = service.path("proxy").path("history").path("response").post(HttpMessageList.class,query);
+    	if (result != null) return result.messages;
+    	return null;
     }
     
-    public HttpRequestResponseBean findInRequestHistory(String regex) {
-    	HttpRequestResponseBean result = service.path("proxy").path("history").path("request").path(regex).get(HttpRequestResponseBean.class);
-    	return result;
+    public List<HttpMessage> findInRequestHistory(String regex) throws UnsupportedEncodingException {
+    	String query = "regex="+URLEncoder.encode(regex, "UTF-8");
+    	HttpMessageList result = null;
+    	try {
+    		result = service.path("proxy").path("history").path("request").post(HttpMessageList.class,query);
+    		if (result != null) return result.messages;
+    	} catch (UniformInterfaceException uie) {
+    		log.error(uie.getMessage());
+    	}
+    	return null;
     }
 
     public Map<String, String> getConfig() {

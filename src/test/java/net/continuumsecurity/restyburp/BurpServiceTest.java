@@ -22,7 +22,8 @@
  */
 package net.continuumsecurity.restyburp;
 
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.MessageType;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -69,15 +70,15 @@ public class BurpServiceTest {
 		}
     }
 
-    @Test
+  /*  @Test
     public void testFindInResponse() {
     	String regex = ".*password.*";
     	driver.get(target);
     	driver.get(target+"user/login");
-    	HttpRequestResponseBean result = burp.findInResponseHistory(regex);
+    	HttpMessage result = burp.findInHistory(regex,MessageType.RESPONSE);
     	assert (new String(result.getResponse()).contains(regex));
     	log.debug("Test done");
-    }
+    }*/
     
    
 
@@ -94,6 +95,7 @@ public class BurpServiceTest {
         log.debug("All completed.");
     }
     
+    /*
     public static void main (String... args) {
         try {
             BurpServiceTest bst = new BurpServiceTest();
@@ -104,5 +106,5 @@ public class BurpServiceTest {
             log.error(ex.getMessage());
         }
         
-    }
+    }*/
 }

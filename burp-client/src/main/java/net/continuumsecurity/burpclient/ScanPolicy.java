@@ -90,7 +90,7 @@ public class ScanPolicy {
         keys.add(CACHING);
         keys.add(COOKIES);
         keys.add(LINKS);
-                keys.add(VIEWSTATE);
+        keys.add(VIEWSTATE);
         return keys;
     }
 
@@ -131,4 +131,86 @@ public class ScanPolicy {
     public HashMap<String, String> getPolicy() {
         return policy;
     }
+    
+	public ScanPolicy enableAllInjectionPoints() {
+		policy.put(ScanPolicy.INSERT_BODY_PARAMS, "true");
+		policy.put(ScanPolicy.INSERT_AMF_PARAMS, "true");
+		policy.put(ScanPolicy.INSERT_COOKIES, "true");
+		policy.put(ScanPolicy.INSERT_HEADERS, "true");
+		policy.put(ScanPolicy.INSERT_PARAM_NAME, "true");
+		policy.put(ScanPolicy.INSERT_URL_PARAMS, "true");
+		return this;
+	}
+
+	public ScanPolicy enableRESTparams() {
+		policy.put(ScanPolicy.INSERT_REST_PARAMS, "true");
+		return this;
+	}
+
+	public ScanPolicy enablePassive() {
+		enable(ScanPolicy.FORMS,
+				ScanPolicy.LINKS, ScanPolicy.PARAMS, ScanPolicy.COOKIES,
+				ScanPolicy.MIME, ScanPolicy.CACHING,
+				ScanPolicy.INFO_DISCLOSURE, ScanPolicy.VIEWSTATE);
+		return this;
+	}
+
+	public ScanPolicy enableSQLinjection() {
+		enable(ScanPolicy.SQL_INJECTION,
+				ScanPolicy.SQL_INJECTION_BOOLEAN,
+				ScanPolicy.SQL_INJECTION_ERROR);
+		return this;
+	}
+	
+	public ScanPolicy enableSQLinjectionTiming() {
+		enable(ScanPolicy.SQL_INJECTION_TIME);
+		return this;
+	}
+
+	public ScanPolicy enableLDAPinjection() {
+		enable(ScanPolicy.LDAP_INJECTION)
+				.getPolicy();
+		return this;
+	}
+
+	public ScanPolicy enableXMLinjection() {
+		enable(ScanPolicy.XML_SOAP_INJECTION)
+				.getPolicy();
+		return this;
+	}
+
+	public ScanPolicy enableMisc() {
+		enable(ScanPolicy.PATH_TRAVERSAL,
+				ScanPolicy.HEADER_INJECTION, ScanPolicy.HEADER_MANIPULATION,
+				ScanPolicy.SERVER_ISSUES);
+		return this;
+	}
+
+	public ScanPolicy enableXSS() {
+		enable(ScanPolicy.REFLECTED_XSS,
+				ScanPolicy.STORED_XSS);
+		return this;
+	}
+
+	public ScanPolicy enableCommandInjection() {
+		enable(ScanPolicy.COMMAND_INJECTION,
+				ScanPolicy.COMMAND_INJECTION_INFORMED,
+				ScanPolicy.COMMAND_INJECTION_BLIND);
+		return this;
+	}
+	
+	public ScanPolicy enableGroupByString(String name) {
+		if ("command.injection".equalsIgnoreCase(name)) this.enableCommandInjection();
+		if ("xss".equalsIgnoreCase(name)) this.enableXSS();
+		if ("misc".equalsIgnoreCase(name)) this.enableMisc();
+		if ("xml.injection".equalsIgnoreCase(name)) this.enableXMLinjection();
+		if ("ldap.injection".equalsIgnoreCase(name)) this.enableLDAPinjection();
+		if ("sql.injection".equalsIgnoreCase(name)) this.enableSQLinjection();
+		if ("sql.injection.timing".equalsIgnoreCase(name)) this.enableSQLinjectionTiming();
+		if ("rest.params".equalsIgnoreCase(name)) this.enableRESTparams();
+		if ("all.injection.points".equalsIgnoreCase(name)) this.enableAllInjectionPoints();
+		if ("passive".equalsIgnoreCase(name)) this.enablePassive();
+		return this;
+	}
+
 }

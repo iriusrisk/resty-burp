@@ -8,7 +8,7 @@ A REST/JSON API to the Burp Suite security tool.
 ## Install
 Install Burp Suite pro into the local maven repo:
 
-	mvn install:install-file -Dfile=burpsuite-pro.jar -DgroupId=portswigger.net -DartifactId=burpsuite-pro -Dversion=1.4.04 -Dpackaging=jar
+	mvn install:install-file -Dfile=burpsuite-pro.jar -DgroupId=net.portswigger -DartifactId=burpsuite-pro -Dversion=1.4.04 -Dpackaging=jar
 
 Then compile:
 

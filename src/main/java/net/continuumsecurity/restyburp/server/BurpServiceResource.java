@@ -40,8 +40,9 @@ import javax.xml.bind.JAXBElement;
 import net.continuumsecurity.restyburp.BurpService;
 import net.continuumsecurity.restyburp.IBurpService;
 import net.continuumsecurity.restyburp.model.Config;
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
-import net.continuumsecurity.restyburp.model.ProxyHistoryList;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.HttpMessageList;
+import net.continuumsecurity.restyburp.model.MessageType;
 import net.continuumsecurity.restyburp.model.ScanIssueList;
 
 import org.apache.log4j.Logger;
@@ -107,28 +108,34 @@ public class BurpServiceResource {
         }
     }
     
-    @GET
-    @Path("proxy/history/response/{regex}")
+    @POST
+    @Path("proxy/history/response")
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpRequestResponseBean searchResponse(@PathParam("regex") String search) {
+    public HttpMessageList searchResponse(@FormParam("regex") String search) {
+    	HttpMessageList result = new HttpMessageList();
         log.debug("Searching for: "+search);
         try {
-            return (burp.findInResponseHistory(search));
+            result.setMessages(burp.findInHistory(search,MessageType.RESPONSE));
         } catch (Exception ex) {
+        	ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
         } 
+        return result;
     }
     
-    @GET
-    @Path("proxy/history/request/{regex}")
+    @POST
+    @Path("proxy/history/request")
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpRequestResponseBean searchRequest(@PathParam("regex") String search) {
+    public HttpMessageList searchRequest(@FormParam("regex") String search) {
+    	HttpMessageList result = new HttpMessageList();
         log.debug("Searching for: "+search);
         try {
-            return (burp.findInRequestHistory(search));
+            result.setMessages(burp.findInHistory(search,MessageType.REQUEST));
         } catch (Exception ex) {
+        	ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
         } 
+        return result;
     }    
 
     @GET
@@ -167,13 +174,13 @@ public class BurpServiceResource {
     @GET
     @Path("proxy/history")
     @Produces(MediaType.APPLICATION_JSON)
-    public ProxyHistoryList getProxyHistory(@QueryParam("url") String url) {
+    public HttpMessageList getProxyHistory(@QueryParam("url") String url) {
         try {
-            ProxyHistoryList historyList = new ProxyHistoryList();
+            HttpMessageList historyList = new HttpMessageList();
             if (url == null) {
-                historyList.history = burp.getProxyHistory();
+                historyList.messages = burp.getProxyHistory();
             } else {
-                historyList.history = burp.getProxyHistory(url);
+                historyList.messages = burp.getProxyHistory(url);
             }
             return historyList;
         } catch (Exception ex) {

@@ -4,7 +4,8 @@ package net.continuumsecurity.restyburp;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.MessageType;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
 
  
@@ -22,10 +23,10 @@ public interface IBurpService {
     List<ScanIssueBean> getIssues(int scanId); 
      
     // Return the whole proxy history.
-    List<HttpRequestResponseBean> getProxyHistory();
+    List<HttpMessage> getProxyHistory();
      
     // Return only the proxy history that matches the given URL. 
-    List<HttpRequestResponseBean> getProxyHistory(String url) throws Exception;
+    List<HttpMessage> getProxyHistory(String url) throws Exception;
      
     // Restore Burp's state with that specified in the blank.burp.state file.
     void reset() throws Exception;
@@ -45,6 +46,6 @@ public interface IBurpService {
     // Load the configuration from a file.
     void loadConfig(String filename);
     
-    HttpRequestResponseBean findInResponseHistory(String regex);
-    HttpRequestResponseBean findInRequestHistory(String regex);
+    List<HttpMessage> findInHistory(String regex, MessageType type);
+    
 }

@@ -27,8 +27,8 @@ import com.sun.jersey.api.json.JSONJAXBContext;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
-import net.continuumsecurity.restyburp.model.ProxyHistoryList;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.HttpMessageList;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
 import net.continuumsecurity.restyburp.model.ScanIssueList;
 
@@ -36,7 +36,7 @@ import net.continuumsecurity.restyburp.model.ScanIssueList;
 public class JAXBContextResolver implements ContextResolver<JAXBContext> {
  
      private JAXBContext context;
-     private Class[] types = {ProxyHistoryList.class,ScanIssueList.class,ScanIssueBean.class,HttpRequestResponseBean.class};
+     private Class[] types = {HttpMessageList.class,ScanIssueList.class,ScanIssueBean.class,HttpMessage.class};
  
      public JAXBContextResolver() throws Exception {
          this.context = 

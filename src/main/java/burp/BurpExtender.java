@@ -22,17 +22,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import net.continuumsecurity.restyburp.ScanQueueMap;
 import net.continuumsecurity.restyburp.Utils;
+import net.continuumsecurity.restyburp.model.ScanIssueBean;
+import net.continuumsecurity.restyburp.model.ScanIssueList;
+
 import org.apache.log4j.Logger;
 
+/*
+ * Can only handle 1 scan at a time, have to perform resets() between scans to clear the issues.
+ */
 public class BurpExtender implements IBurpExtender {
     static Logger log = Logger.getLogger(BurpExtender.class.toString());
     private IBurpExtenderCallbacks callbacks;
     private Set<URL> outOfScope = new HashSet<URL>();
     private static BurpExtender instance;
     private String configFile = null;
+    private ScanIssueList issueList = new ScanIssueList();
 
     //Wait for the instance to be initialised
     public static BurpExtender getInstance() {
@@ -42,7 +54,6 @@ public class BurpExtender implements IBurpExtender {
 
     public void setCommandLineArgs(String[] args) {
     }
-    
 
     //This function is called once when Burp Suite loads 
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
@@ -63,6 +74,7 @@ public class BurpExtender implements IBurpExtender {
     }
     
     public void reset() throws Exception {
+    	issueList.getIssues().clear();
         callbacks.restoreState(new File("blank.burp.state"));
     }     
 
@@ -78,7 +90,7 @@ public class BurpExtender implements IBurpExtender {
                     
                     if (!callbacks.isInScope(rr.getUrl())) {
                     	callbacks.includeInScope(rr.getUrl());
-                    	log.debug("\tcallbacks.isInScope("+rr.getUrl()+") is "+callbacks.isInScope(rr.getUrl()));
+                    	log.trace("\tcallbacks.isInScope("+rr.getUrl()+") is "+callbacks.isInScope(rr.getUrl()));
                     }              
                     boolean useHttps = rr.getProtocol().equalsIgnoreCase("https");
                     log.debug("\tabout to scan: "+rr.getHost()+" "+rr.getPort()+" "+rr.getUrl());
@@ -97,14 +109,18 @@ public class BurpExtender implements IBurpExtender {
     }
 
     public void newScanIssue(IScanIssue issue) {
-        log.debug("Found issue: " + issue.getIssueName());
+        log.debug("Found issue: " + issue.getIssueName()+" in Url: "+issue.getUrl());
+        issueList.getIssues().add(new ScanIssueBean(issue));
     }
     
     public IBurpExtenderCallbacks getCallbacks() {
         return callbacks;
     }
     
-
+    public ScanIssueList getIssueList() {
+    	return issueList;
+    }
+    
     // Called during proxy requests, not needed with processHttpMessage
     public byte[] processProxyMessage(
             int messageReference,

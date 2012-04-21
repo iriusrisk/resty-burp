@@ -53,4 +53,9 @@ public class ScanPolicyTest {
         
         Assert.assertEquals("false",sp2.disable(ScanPolicy.REFLECTED_XSS).get(ScanPolicy.REFLECTED_XSS));
     }
+    
+    @Test
+    public void testAddingGroupByString() {
+    	
+    }
 }

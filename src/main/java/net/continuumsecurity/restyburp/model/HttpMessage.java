@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author stephen
  */
 @XmlRootElement
-public class HttpRequestResponseBean implements IHttpRequestResponse {
+public class HttpMessage implements IHttpRequestResponse {
     private String host;
     private int port;
     private String protocol;
@@ -42,9 +42,9 @@ public class HttpRequestResponseBean implements IHttpRequestResponse {
     private String highlight;
     private URL url;
 
-    public HttpRequestResponseBean() {}
+    public HttpMessage() {}
     
-    public HttpRequestResponseBean(IHttpRequestResponse ihrr) {
+    public HttpMessage(IHttpRequestResponse ihrr) {
         host = ihrr.getHost();
         port = ihrr.getPort();
         try {

@@ -40,7 +40,7 @@ public class ScanIssueBean implements IScanIssue {
     protected String remediationBackground;
     private URL url;
     protected String remediationDetail;
-    private HttpRequestResponseBean[] httpMessages;
+    private HttpMessage[] httpMessages;
     protected String severity;
 
     public ScanIssueBean() {
@@ -56,9 +56,9 @@ public class ScanIssueBean implements IScanIssue {
         remediationBackground = theIssue.getRemediationBackground();
         url = theIssue.getUrl();
         remediationDetail = theIssue.getRemediationDetail();
-        httpMessages = new HttpRequestResponseBean[theIssue.getHttpMessages().length];
+        httpMessages = new HttpMessage[theIssue.getHttpMessages().length];
         for (int i=0;i <= theIssue.getHttpMessages().length-1;i++) {
-            httpMessages[i] = new HttpRequestResponseBean(theIssue.getHttpMessages()[i]);
+            httpMessages[i] = new HttpMessage(theIssue.getHttpMessages()[i]);
         }
         severity = theIssue.getSeverity();
     }
@@ -241,14 +241,14 @@ public class ScanIssueBean implements IScanIssue {
      * @return the httpMessages
      */
     @XmlElementWrapper(name = "httpMessage")
-    public HttpRequestResponseBean[] getHttpMessages() {
+    public HttpMessage[] getHttpMessages() {
         return httpMessages;
     }
 
     /**
      * @param httpMessages the httpMessages to set
      */
-    public void setHttpMessages(HttpRequestResponseBean[] httpMessages) {
+    public void setHttpMessages(HttpMessage[] httpMessages) {
         this.httpMessages = httpMessages;
     }
 }

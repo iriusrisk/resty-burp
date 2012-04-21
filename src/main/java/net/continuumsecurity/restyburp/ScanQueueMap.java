@@ -57,7 +57,7 @@ public class ScanQueueMap {
     }
 
     public boolean hasUrl(String url) {
-        log.debug(" Checking whether map.hasUrl("+url+")");
+        log.trace(" Checking whether map.hasUrl("+url+")");
         for (String theUrl : map.keySet()) {
             log.trace("  found: "+theUrl);
             if (theUrl.equalsIgnoreCase(url)) return true;
@@ -80,9 +80,9 @@ public class ScanQueueMap {
         for (String key : getUrls()) {
             log.debug(" Getting issues for: "+key);
             for (IScanQueueItem scanQueue : getQueue(key)) {
-                log.debug(" ScanQueueItem: "+scanQueue.toString());
+                log.debug(" ScanQueueItem has "+scanQueue.getIssues().length+" issues.");
                 for (IScanIssue issue : scanQueue.getIssues()) {
-                    log.debug("  Adding issue: " + issue.getIssueName());
+                    log.debug("  Found issue, adding: " + issue.getIssueName());
                     issues.add(new ScanIssueBean(issue));
                 }
             }
