@@ -301,7 +301,8 @@ public class BurpService implements IBurpService {
 	public void reset() throws Exception {
 		scans.clear();
 		extender.reset();
-		log.debug("Burp state reset");
+		log.debug("Burp state reset.");
+		log.debug(this.getIssues(0).size()+" issues after reset.");
 	}
 
 	public void startRESTServer() {
