@@ -22,16 +22,19 @@
  */
 package net.continuumsecurity.restyburp;
 
-import net.continuumsecurity.restyburp.model.HttpMessage;
-import net.continuumsecurity.restyburp.model.MessageType;
+import net.continuumsecurity.burpclient.ScanPolicy;
+import net.continuumsecurity.restyburp.model.ScanIssueBean;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
 
 /*
  * Not a proper JUnit test, having problems loading Jersey/Burp through JUnit, for now just using the main method to test manually
@@ -41,7 +44,9 @@ public class BurpServiceTest {
     HtmlUnitDriver driver;
     static IBurpService burp;
     Settings settings;
-    final String target = "http://localhost:9110/ropeytasks/";
+    final String HOMEPAGE = "http://localhost:9110/ropeytasks/";
+    final String LOGINPAGE = HOMEPAGE + "user/login";
+    final String SEARCHPAGE = HOMEPAGE + "task/search?q=test&search=Search";
     int proxyPort = 8080;
 
     public BurpServiceTest() {
@@ -50,6 +55,7 @@ public class BurpServiceTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         //burp = BurpService.getInstance();
+		PropertyConfigurator.configure("log4j.properties");
         burp = BurpService.getInstance();
     }
 
@@ -80,19 +86,52 @@ public class BurpServiceTest {
     	log.debug("Test done");
     }*/
     
-   
-
+    public void login(String username,String password) {
+		driver.findElement(By.id("username")).clear();
+		driver.findElement(By.id("username")).sendKeys(username);
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys(password);
+		driver.findElement(By.name("_action_login")).click();
+	}
     
-    public void testScanQueue() throws Exception {
+    @Test
+    public void testPassiveScan() throws Exception {
         ScanQueueMap sq;
-        driver.get(target);
-        int scanId = burp.scan(target);
-        log.debug(">>> New scan with scanID="+scanId);
-        while (burp.getPercentageComplete(scanId) < 100) {
-            log.debug("Complete: "+burp.getPercentageComplete(scanId));
+        driver.get(HOMEPAGE);
+    	driver.get(LOGINPAGE);
+    	login("bob","password");
+    	driver.get(SEARCHPAGE);
+    	burp.setConfig(new ScanPolicy().enablePassive().getPolicy());
+        burp.scan(HOMEPAGE);
+        //for (int i=0;i <10;i++) {
+        while (burp.getPercentageComplete() < 100) {
+            log.debug("Complete: "+burp.getPercentageComplete());
             Thread.sleep(2000);
         }
-        log.debug("All completed.");
+        for (ScanIssueBean issue: burp.getIssues()) {
+        	log.debug("Issue: "+issue.getIssueName()+" in "+issue.getUrl());
+        }
+        assertEquals(2,burp.getIssues().size());
+    }
+    
+    @Test
+    public void testXSSScan() throws Exception {
+        ScanQueueMap sq;
+        driver.get(HOMEPAGE);
+    	driver.get(LOGINPAGE);
+    	login("bob","password");
+    	driver.get(SEARCHPAGE);
+    	burp.setConfig(new ScanPolicy().enableXSS().getPolicy());
+        burp.scan(SEARCHPAGE);
+        //for (int i=0;i <10;i++) {
+        while (burp.getPercentageComplete() < 100) {
+            log.debug("Complete: "+burp.getPercentageComplete());
+            Thread.sleep(2000);
+        }
+        for (ScanIssueBean issue: burp.getIssues()) {
+        	log.debug("Issue: "+issue.getIssueName()+" in "+issue.getUrl());
+        }
+        assertEquals(1,burp.getIssues().size());
     }
     
     /*

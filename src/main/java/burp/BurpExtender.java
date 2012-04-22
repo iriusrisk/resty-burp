@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.continuumsecurity.burpclient.ScanPolicy;
 import net.continuumsecurity.restyburp.ScanQueueMap;
 import net.continuumsecurity.restyburp.Utils;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
@@ -86,16 +87,17 @@ public class BurpExtender implements IBurpExtender {
             try {
                 URL url = new URL(baseUrl);
                 if (Utils.containsUrl(rr.getUrl(), url) && !outOfScope.contains(rr.getUrl()) && !map.hasUrl(rr.getUrl().toExternalForm())) {
-                    log.debug("Adding " + rr.getUrl() + " to scope.");
-                    
+                    log.debug("\tcallbacks.isInScope("+rr.getUrl()+") is "+callbacks.isInScope(rr.getUrl()));
                     if (!callbacks.isInScope(rr.getUrl())) {
                     	callbacks.includeInScope(rr.getUrl());
-                    	log.trace("\tcallbacks.isInScope("+rr.getUrl()+") is "+callbacks.isInScope(rr.getUrl()));
-                    }              
+                    } 
                     boolean useHttps = rr.getProtocol().equalsIgnoreCase("https");
-                    log.debug("\tabout to scan: "+rr.getHost()+" "+rr.getPort()+" "+rr.getUrl());
+                    log.debug("\tabout to scan: "+rr.getUrl());
                     IScanQueueItem isq = callbacks.doActiveScan(rr.getHost(), rr.getPort(), useHttps, rr.getRequest());
+                    log.debug("ScanItem for "+rr.getUrl()+" has "+isq.getNumRequests()+" requests, "+isq.getNumInsertionPoints()+" insertion points, status: "+isq.getStatus());
+                    log.debug("\tadding "+rr.getUrl().toExternalForm()+" to ScanQueueMap");
                     map.addItem(rr.getUrl().toExternalForm(), isq);
+                    if (isPassiveEnabled()) callbacks.doPassiveScan(rr.getHost(), rr.getPort(), useHttps, rr.getRequest(),rr.getResponse());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -148,6 +150,18 @@ public class BurpExtender implements IBurpExtender {
     
     public void setConfigFile(String filename) {
         configFile = filename;
+    }
+    
+    public boolean isPassiveEnabled() {
+    	Map<String, String> config = callbacks.saveConfig();
+        if (config.get(ScanPolicy.MIME).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.PARAMS).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.FORMS).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.CACHING).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.COOKIES).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.LINKS).equalsIgnoreCase("true")) return true;
+        if (config.get(ScanPolicy.VIEWSTATE).equalsIgnoreCase("true")) return true;
+        return false;
     }
     
     private void saveConfig(String filename) {

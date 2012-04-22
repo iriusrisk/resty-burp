@@ -43,8 +43,13 @@ public class ScanQueueMap {
 
     public ScanQueueMap() {
     }
+    
+    public void clear() {
+    	map.clear();
+    }
 
     public void addItem(String url, IScanQueueItem scanItem) {
+    	
         if (map.containsKey(url)) {
             List<IScanQueueItem> list = map.get(url);
             assert list != null;
@@ -90,6 +95,17 @@ public class ScanQueueMap {
         return issues;
     }
 
+    public String toString() {
+    	StringBuffer result = new StringBuffer();
+    	 for (String key : getUrls()) {
+             result.append("\n").append(key);
+             for (IScanQueueItem scanQueue : getQueue(key)) {
+                result.append("\n\tRequests: ").append(scanQueue.getNumRequests()).append(", ").append(scanQueue.getPercentageComplete()).append("% complete");
+             }
+         }
+    	 return result.toString();
+    }
+    
     public int getPercentageComplete() {
         if (map.keySet().size() == 0) return 100;
         int numItems = 0;

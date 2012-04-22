@@ -49,19 +49,18 @@ public class BurpClient {
         service = client.resource(UriBuilder.fromUri(baseUrl).build());
     }
 
-    public int scan(String url) throws Exception {
+    public void scan(String url) throws Exception {
         String query = "target=" + URLEncoder.encode(url, "UTF-8");
         ClientResponse response = service.path("scanner").path("scan").post(ClientResponse.class, query);
-        return response.getEntity(JSONObject.class).getInt("id");
     }
 
-    public int percentComplete(int id) throws Exception {
-        ClientResponse response = service.path("scanner").path(Integer.toString(id)).path("complete").get(ClientResponse.class);
+    public int percentComplete() throws Exception {
+        ClientResponse response = service.path("scanner").path("complete").get(ClientResponse.class);
         return response.getEntity(JSONObject.class).getInt("complete");
     }
 
-    public ScanIssueList getIssueList(int scanId) {
-        return (service.path("scanner").path(Integer.toString(scanId)).path("issues").get(ScanIssueList.class));
+    public ScanIssueList getIssueList() {
+        return (service.path("scanner").path("issues").get(ScanIssueList.class));
     }
 
     public List<HttpMessage> getProxyHistory() {
@@ -109,6 +108,10 @@ public class BurpClient {
     
     public void reset() throws RuntimeException {
         service.path("reset").type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    }
+    
+    public void clearIssues() throws RuntimeException {
+        service.path("clear").type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     }
     
     public void destroy() {

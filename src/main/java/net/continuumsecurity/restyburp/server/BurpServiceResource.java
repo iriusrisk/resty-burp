@@ -64,27 +64,21 @@ public class BurpServiceResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response scan(@FormParam("target") String target) {
         log.debug("Starting scan of: " + target);
-        JSONObject id;
         try {
-            int scanId = burp.scan(target);
-            id = new JSONObject().put("id", scanId);
-        } catch (JSONException ex) {
-            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+        	burp.scan(target);       
         } catch (MalformedURLException mue) {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, mue.getMessage());
         }
-        return Response.ok().entity(id).build();
+        return Response.ok().build();
     }
 
     @GET
-    @Path("scanner/{scanId}/complete")
+    @Path("scanner/complete")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response percentComplete(@PathParam("scanId") int scanId) {
-        //log.debug("Fetching percentage complete of: "+scanId);
+    public Response percentComplete() {
         JSONObject complete;
         try {
-            complete = new JSONObject().put("complete", burp.getPercentageComplete(scanId));
-            
+            complete = new JSONObject().put("complete", burp.getPercentageComplete());
         } catch (JSONException ex) {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
@@ -92,15 +86,13 @@ public class BurpServiceResource {
     }
 
     @GET
-    @Path("scanner/{scanId}/issues")
+    @Path("scanner/issues")
     @Produces(MediaType.APPLICATION_JSON)
-    public ScanIssueList getIssues(@PathParam("scanId") int scanId) {
-        log.debug("Fetching issues for: "+scanId);
+    public ScanIssueList getIssues() {
         try {
             ScanIssueList il = new ScanIssueList();
-            il.setIssues(burp.getIssues(scanId));
+            il.setIssues(burp.getIssues());
             log.debug(" "+il.getIssues().size()+" issues found.");
-
             return il;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -195,6 +187,19 @@ public class BurpServiceResource {
     public Response clearScans() {
         try {
             burp.reset();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+        return Response.ok().build();
+    }
+    
+    @GET
+    @Path("clear")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response clearIssues() {
+        try {
+            burp.clearIssues();
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());

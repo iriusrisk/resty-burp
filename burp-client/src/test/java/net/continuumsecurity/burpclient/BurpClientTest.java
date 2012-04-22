@@ -1,7 +1,6 @@
 package net.continuumsecurity.burpclient;
 
 import net.continuumsecurity.restyburp.Settings;
-import net.continuumsecurity.restyburp.model.HttpRequestResponseBean;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
@@ -39,8 +38,9 @@ public class BurpClientTest {
 				e.printStackTrace();
 			}
 	    }
+	    
 
-	    //@Test
+	    /*@Test
 	    public void testFindInResponse() {
 	    	String regex = ".*<input.*?type.*?=.*?pasword.*";
 	    	//driver.get(target);
@@ -54,7 +54,7 @@ public class BurpClientTest {
 	    	String response = new String(result.getResponse());
 	    	assert (response.contains(regex));
 	    	log.debug("Response="+response);
-	    }
+	    }*/
 	    
 
 }

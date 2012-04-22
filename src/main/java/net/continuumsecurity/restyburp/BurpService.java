@@ -63,7 +63,7 @@ public class BurpService implements IBurpService {
 	static Logger log = Logger.getLogger(BurpService.class.toString());
 	BurpExtender extender;
 	// Map of scanIds to ScanQueueMaps
-	Map<Integer, ScanQueueMap> scans = new HashMap<Integer, ScanQueueMap>();
+	ScanQueueMap scans = new ScanQueueMap();
 	int currentScanId = 0;
 	static boolean headless = false;
 	static String configFile = null;
@@ -92,6 +92,10 @@ public class BurpService implements IBurpService {
 		assert extender != null;
 	}
 
+	public ScanQueueMap getScanQueue() {
+		return scans;
+	}
+	
 	public static BurpService getInstance() {
 		if (instance == null) {
 			instance = new BurpService();
@@ -183,11 +187,10 @@ public class BurpService implements IBurpService {
 	}
 
 	@Override
-	public synchronized int scan(String target) throws MalformedURLException {
+	public synchronized void scan(String target) throws MalformedURLException {
 		URL targetUrl = new URL(target);
 		currentScanId++;
-		scans.put(currentScanId, extender.scan(targetUrl.toExternalForm()));
-		return currentScanId;
+		scans = extender.scan(targetUrl.toExternalForm());
 	}
 
 	/*
@@ -196,32 +199,27 @@ public class BurpService implements IBurpService {
 	 */
 	public boolean alreadyScanned(String target) {
 		log.debug(" Checking if already scanned: " + target);
-		for (ScanQueueMap sqm : scans.values()) {
-			for (String url : sqm.getUrls()) {
-				log.debug("  already scanned: " + url);
-				if (url.equalsIgnoreCase(target)) {
-					log.debug(" Already scanned.");
-					return true;
-				}
-			}
 
+		for (String url : scans.getUrls()) {
+			log.debug("  already scanned: " + url);
+			if (url.equalsIgnoreCase(target)) {
+				log.debug(" Already scanned.");
+				return true;
+			}
 		}
+
 		log.debug(" Not already scanned");
 		return false;
 	}
 
 	@Override
-	public int getPercentageComplete(int scanId) {
-		log.debug("Getting percentage complete for scanId: " + scanId);
-		ScanQueueMap sqm = scans.get(scanId);
-		if (sqm == null) {
-			throw new ScanNotFoundException("Scan ID not found: " + scanId);
-		}
-		return sqm.getPercentageComplete();
+	public int getPercentageComplete() {
+		log.debug("Getting percentage complete.");
+		return scans.getPercentageComplete();
 	}
 
 	@Override
-	public List<ScanIssueBean> getIssues(int scanId) {
+	public List<ScanIssueBean> getIssues() {
 		return extender.getIssueList().getIssues();
 		/*
 		 * log.debug("Getting SanQueueMap for scanId: "+scanId); ScanQueueMap
@@ -299,10 +297,16 @@ public class BurpService implements IBurpService {
 
 	@Override
 	public void reset() throws Exception {
-		scans.clear();
 		extender.reset();
+		clearIssues();
 		log.debug("Burp state reset.");
-		log.debug(this.getIssues(0).size()+" issues after reset.");
+		log.debug(this.getIssues().size() + " issues after reset.");
+	}
+	
+	@Override
+	public void clearIssues() throws Exception {
+		scans.clear();
+		extender.getIssueList().getIssues().clear();
 	}
 
 	public void startRESTServer() {
@@ -331,7 +335,6 @@ public class BurpService implements IBurpService {
 	}
 
 	public static void main(String... args) {
-
 		OptionParser parser = new OptionParser();
 		parser.accepts("f").withOptionalArg().ofType(String.class);
 		parser.accepts("g");

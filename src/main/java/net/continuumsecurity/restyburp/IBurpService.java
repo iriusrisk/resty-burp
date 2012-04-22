@@ -14,14 +14,15 @@ import net.continuumsecurity.restyburp.model.ScanIssueBean;
 public interface IBurpService {
 	 
 	//  Scan a given URL.  Will scan based on the traffic already captured by burp.
-    int scan(String target) throws MalformedURLException;   
+    void scan(String target) throws MalformedURLException;   
      
     //  Returns 0-100 depending on the completion of a scan
-    int getPercentageComplete(int scanId);   
+    int getPercentageComplete();   
      
     // Returns a list of ScanIssueBean's that represent the issues found so far for a given scan ID. 
-    List<ScanIssueBean> getIssues(int scanId); 
+    List<ScanIssueBean> getIssues(); 
      
+    ScanQueueMap getScanQueue();
     // Return the whole proxy history.
     List<HttpMessage> getProxyHistory();
      
@@ -30,6 +31,8 @@ public interface IBurpService {
      
     // Restore Burp's state with that specified in the blank.burp.state file.
     void reset() throws Exception;
+    
+    void clearIssues() throws Exception;
      
     // Return the current configuration.
     Map<String,String> getConfig();
