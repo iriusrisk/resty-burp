@@ -1,13 +1,18 @@
 package net.continuumsecurity.burpclient;
 
 import net.continuumsecurity.restyburp.Settings;
-
+import net.continuumsecurity.restyburp.model.HttpMessage;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
+import java.io.UnsupportedEncodingException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class BurpClientTest {
 	   static Logger log = Logger.getLogger(BurpClientTest.class.toString());
@@ -38,6 +43,17 @@ public class BurpClientTest {
 				e.printStackTrace();
 			}
 	    }
+
+        @Test
+        public void testMakeRequest() throws UnsupportedEncodingException {
+            driver.get(target+"user/login");
+            HttpMessage message = burp.getProxyHistory().get(0);
+            assertNotNull(message.getResponse());
+            HttpMessage manual = burp.makeRequest("localhost",9110,false,message.getRequest());
+            String orig = message.getResponseBody();
+            String manualBody = manual.getResponseBody();
+            assertEquals(orig, manualBody);
+        }
 	    
 
 	    /*@Test

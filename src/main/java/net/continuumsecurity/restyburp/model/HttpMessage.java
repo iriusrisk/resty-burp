@@ -23,8 +23,10 @@
 package net.continuumsecurity.restyburp.model;
 
 import burp.IHttpRequestResponse;
-import java.net.URL;
+
 import javax.xml.bind.annotation.XmlRootElement;
+import java.net.URL;
+import java.util.Map;
 
 /**
  *
@@ -47,19 +49,52 @@ public class HttpMessage implements IHttpRequestResponse {
     public HttpMessage(IHttpRequestResponse ihrr) {
         host = ihrr.getHost();
         port = ihrr.getPort();
+
         try {
             protocol = ihrr.getProtocol();
             request = ihrr.getRequest();
             response = ihrr.getResponse();
             statusCode = ihrr.getStatusCode();
             url = ihrr.getUrl();
+            comment = ihrr.getComment();
+            highlight = ihrr.getHighlight();
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
+    public String getResponseAsString() {
+        return new String(getResponse());
+    }
+
+    public String getRequestAsString() {
+        return new String(getRequest());
+    }
+
+    private String extractBody(String content) {
+        return content.substring(content.indexOf("\r\n\r\n"),content.length());
+    }
+
+    public String getResponseBody() {
+        return extractBody(new String(getResponse()));
+    }
+
+    public String getRequestBody() {
+        return extractBody(new String(getRequest()));
+    }
+
     public String getHost() {
         return host;
+    }
+
+    public void replaceCookies(Map<String,String> cookies) {
+        String content = new String(getRequest());
+        for (String key : cookies.keySet()) {
+            content = content.replaceAll(key+"=.+?;",key+"="+cookies.get(key)+";");
+            content = content.replaceAll(key+"=[^;]+?\\r\\n",key+"="+cookies.get(key)+"\r\n");
+        }
+        request = content.getBytes();
     }
 
     /**

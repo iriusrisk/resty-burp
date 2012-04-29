@@ -1,18 +1,18 @@
 /*******************************************************************************
  * BDD-Security, application security testing framework
- * 
+ *
  * Copyright (C) `2012 Stephen de Vries`
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see `<http://www.gnu.org/licenses/>`.
  ******************************************************************************/
@@ -22,32 +22,18 @@
  */
 package net.continuumsecurity.restyburp.server;
 
-import java.net.MalformedURLException;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
-
 import net.continuumsecurity.restyburp.BurpService;
 import net.continuumsecurity.restyburp.IBurpService;
-import net.continuumsecurity.restyburp.model.Config;
-import net.continuumsecurity.restyburp.model.HttpMessage;
-import net.continuumsecurity.restyburp.model.HttpMessageList;
-import net.continuumsecurity.restyburp.model.MessageType;
-import net.continuumsecurity.restyburp.model.ScanIssueList;
-
+import net.continuumsecurity.restyburp.model.*;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import java.net.MalformedURLException;
 
 /*
  * POST /scan/new url returns scanid
@@ -65,7 +51,7 @@ public class BurpServiceResource {
     public Response scan(@FormParam("target") String target) {
         log.debug("Starting scan of: " + target);
         try {
-        	burp.scan(target);       
+            burp.scan(target);
         } catch (MalformedURLException mue) {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, mue.getMessage());
         }
@@ -92,43 +78,58 @@ public class BurpServiceResource {
         try {
             ScanIssueList il = new ScanIssueList();
             il.setIssues(burp.getIssues());
-            log.debug(" "+il.getIssues().size()+" issues found.");
+            log.debug(" " + il.getIssues().size() + " issues found.");
             return il;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
-    
+
     @POST
     @Path("proxy/history/response")
     @Produces(MediaType.APPLICATION_JSON)
     public HttpMessageList searchResponse(@FormParam("regex") String search) {
-    	HttpMessageList result = new HttpMessageList();
-        log.debug("Searching for: "+search);
+        HttpMessageList result = new HttpMessageList();
+        log.debug("Searching for: " + search);
         try {
-            result.setMessages(burp.findInHistory(search,MessageType.RESPONSE));
+            result.setMessages(burp.findInHistory(search, MessageType.RESPONSE));
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
-        } 
+        }
         return result;
     }
-    
+
     @POST
     @Path("proxy/history/request")
     @Produces(MediaType.APPLICATION_JSON)
     public HttpMessageList searchRequest(@FormParam("regex") String search) {
-    	HttpMessageList result = new HttpMessageList();
-        log.debug("Searching for: "+search);
+        HttpMessageList result = new HttpMessageList();
+        log.debug("Searching for: " + search);
         try {
-            result.setMessages(burp.findInHistory(search,MessageType.REQUEST));
+            result.setMessages(burp.findInHistory(search, MessageType.REQUEST));
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
-        } 
+        }
         return result;
-    }    
+    }
+
+    @POST
+    @Path("make/request")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpMessage makeRequest(HttpMessage message) {
+        log.debug("Sending request: " + new String(message.getRequest()));
+        try {
+            boolean useHttps = "https".equalsIgnoreCase(message.getProtocol()) ? true : false;
+            message.setResponse(burp.makeRequest(message.getHost(),message.getPort(),useHttps,message.getRequest()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+        return message;
+    }
 
     @GET
     @Path("config")
@@ -193,7 +194,7 @@ public class BurpServiceResource {
         }
         return Response.ok().build();
     }
-    
+
     @GET
     @Path("clear")
     @Produces(MediaType.APPLICATION_JSON)

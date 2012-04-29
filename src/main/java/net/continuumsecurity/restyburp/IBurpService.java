@@ -1,12 +1,13 @@
 
 package net.continuumsecurity.restyburp;
 
-import java.net.MalformedURLException;
-import java.util.List;
-import java.util.Map;
 import net.continuumsecurity.restyburp.model.HttpMessage;
 import net.continuumsecurity.restyburp.model.MessageType;
 import net.continuumsecurity.restyburp.model.ScanIssueBean;
+
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.Map;
 
  
  
@@ -31,7 +32,8 @@ public interface IBurpService {
      
     // Restore Burp's state with that specified in the blank.burp.state file.
     void reset() throws Exception;
-    
+
+    byte[] makeRequest(String host,int port,boolean useHttps,byte[] request) throws Exception;
     void clearIssues() throws Exception;
      
     // Return the current configuration.

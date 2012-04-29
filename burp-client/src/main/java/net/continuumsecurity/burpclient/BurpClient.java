@@ -10,13 +10,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 import net.continuumsecurity.restyburp.model.Config;
 import net.continuumsecurity.restyburp.model.HttpMessage;
 import net.continuumsecurity.restyburp.model.HttpMessageList;
@@ -24,6 +17,13 @@ import net.continuumsecurity.restyburp.model.ScanIssueList;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.jettison.json.JSONObject;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -71,6 +71,23 @@ public class BurpClient {
     public List<HttpMessage> getProxyHistory(String url) throws UnsupportedEncodingException {
         HttpMessageList result = service.path("proxy").path("history").queryParam("url", url).get(HttpMessageList.class);
         return result.messages;
+    }
+
+    public HttpMessage makeRequest(HttpMessage message) {
+        return service.path("make").path("request").post(HttpMessage.class,message);
+    }
+
+    public HttpMessage makeRequest(String host,int port,boolean useHttps,byte[] request) throws UnsupportedEncodingException {
+        HttpMessage message = new HttpMessage();
+        message.setHost(host);
+        message.setPort(port);
+        if (useHttps) {
+            message.setProtocol("https");
+        } else {
+            message.setProtocol("http");
+        }
+        message.setRequest(request);
+        return service.path("make").path("request").post(HttpMessage.class,message);
     }
     
     public List<HttpMessage> findInResponseHistory(String regex) throws UnsupportedEncodingException {

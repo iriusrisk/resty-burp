@@ -22,36 +22,27 @@
  */
 package net.continuumsecurity.restyburp;
 
+import burp.BurpExtender;
+import burp.IHttpRequestResponse;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import net.continuumsecurity.restyburp.model.HttpMessage;
+import net.continuumsecurity.restyburp.model.MessageType;
+import net.continuumsecurity.restyburp.model.ScanIssueBean;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import net.continuumsecurity.restyburp.model.HttpMessage;
-import net.continuumsecurity.restyburp.model.MessageType;
-import net.continuumsecurity.restyburp.model.ScanIssueBean;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import burp.BurpExtender;
-import burp.IHttpRequestResponse;
-
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 /**
  * 
@@ -67,7 +58,13 @@ public class BurpService implements IBurpService {
 	int currentScanId = 0;
 	static boolean headless = false;
 	static String configFile = null;
-	private static BurpService instance;
+
+    @Override
+    public byte[] makeRequest(String host, int port, boolean useHttps, byte[] request) throws Exception {
+        return extender.getCallbacks().makeHttpRequest(host,port,useHttps,request);
+    }
+
+    private static BurpService instance;
 
 	private BurpService() {
 		PropertyConfigurator.configure("log4j.properties");
@@ -269,7 +266,6 @@ public class BurpService implements IBurpService {
 				e.printStackTrace();
 			}
 		}
-
 		return result;
 	}
 
