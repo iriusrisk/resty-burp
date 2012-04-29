@@ -1,0 +1,11 @@
+POST /ropeytasks/user/login HTTP/1.1
+Host: localhost:9110
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-gb,en;q=0.5
+Accept-Encoding: gzip, deflate
+Cookie: dog=cat; JSESSIONID=34DA1FD199054C9EAB7894B69A081131; 1=2
+Proxy-Connection: keep-alive
+
+username=alice&password=password&_action_login=Login
+
