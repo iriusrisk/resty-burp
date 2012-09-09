@@ -16,9 +16,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.continuumsecurity</groupId>
-			<artifactId>burp-client</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>1.8.5</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
