@@ -42,6 +42,7 @@ public class ScanIssueBean implements IScanIssue {
     protected String remediationDetail;
     private HttpMessage[] httpMessages;
     protected String severity;
+    private int issueType;
 
     public ScanIssueBean() {
     }
@@ -56,6 +57,7 @@ public class ScanIssueBean implements IScanIssue {
         remediationBackground = theIssue.getRemediationBackground();
         url = theIssue.getUrl();
         remediationDetail = theIssue.getRemediationDetail();
+        issueType = theIssue.getIssueType();
         httpMessages = new HttpMessage[theIssue.getHttpMessages().length];
         for (int i=0;i <= theIssue.getHttpMessages().length-1;i++) {
             httpMessages[i] = new HttpMessage(theIssue.getHttpMessages()[i]);
@@ -65,6 +67,10 @@ public class ScanIssueBean implements IScanIssue {
 
     public String getHost() {
         return host;
+    }
+
+    public int getIssueType() {
+        return issueType;
     }
 
     /**
@@ -228,6 +234,9 @@ public class ScanIssueBean implements IScanIssue {
         this.url = url;
     }
 
+    public void setIssueType(int type) {
+        issueType = type;
+    }
     /**
      * Set the value of confidence
      *

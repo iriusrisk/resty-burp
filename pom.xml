@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>net.portswigger</groupId>
 			<artifactId>burpsuite-pro</artifactId>
-			<version>1.4.07</version>
+			<version>1.5rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
