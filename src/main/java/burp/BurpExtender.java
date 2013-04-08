@@ -56,9 +56,11 @@ public class BurpExtender implements IBurpExtender {
     public void setCommandLineArgs(String[] args) {
     }
 
-    //This function is called once when Burp Suite loads 
+    //This function is called once when Burp Suite loads
+    @Override
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         this.callbacks = callbacks;
+        callbacks.setExtensionName("Resty-Burp extension");
         instance = this;
         log.debug("Burp extender initialised.");
     }

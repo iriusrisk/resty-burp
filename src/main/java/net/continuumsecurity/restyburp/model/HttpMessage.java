@@ -23,6 +23,7 @@
 package net.continuumsecurity.restyburp.model;
 
 import burp.IHttpRequestResponse;
+import burp.IHttpService;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URL;
@@ -33,7 +34,7 @@ import java.util.Map;
  * @author stephen
  */
 @XmlRootElement
-public class HttpMessage implements IHttpRequestResponse {
+public class HttpMessage {
     private String host;
     private int port;
     private String protocol;
@@ -43,6 +44,7 @@ public class HttpMessage implements IHttpRequestResponse {
     private String comment;
     private String highlight;
     private URL url;
+    private IHttpService httpService;
 
     public HttpMessage() {}
     
@@ -204,14 +206,4 @@ public class HttpMessage implements IHttpRequestResponse {
         this.comment = comment;
     }
 
-    @Override
-    public String getHighlight() throws Exception {
-        return highlight;
-    }
-
-    @Override
-    public void setHighlight(String highlight) throws Exception {
-        this.highlight = highlight;
-    }
-    
 }

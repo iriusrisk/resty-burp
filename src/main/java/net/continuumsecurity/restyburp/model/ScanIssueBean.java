@@ -23,6 +23,7 @@
 package net.continuumsecurity.restyburp.model;
 
 import burp.IHttpRequestResponse;
+import burp.IHttpService;
 import burp.IScanIssue;
 import java.net.URL;
 
@@ -30,7 +31,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class ScanIssueBean implements IScanIssue {
+public class ScanIssueBean {
     private String host;
     private String issueBackground;
     private String issueDetail;
@@ -91,11 +92,6 @@ public class ScanIssueBean implements IScanIssue {
         return issueBackground;
     }
 
-    /**
-     * Set the value of IssueBackground
-     *
-     * @param IssueBackground new value of IssueBackground
-     */
     public void setIssueBackground(String issueBackground) {
         this.issueBackground = issueBackground;
     }

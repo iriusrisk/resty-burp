@@ -71,7 +71,14 @@ public class BurpService implements IBurpService {
 		log.debug("Creating new burp service");
 		System.setProperty("java.awt.headless", Boolean.toString(headless));
 		burp.StartBurp.main(new String[0]);
-		extender = BurpExtender.getInstance();
+        try {
+            log.debug("Waiting for burp to start up...");
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        extender = BurpExtender.getInstance();
 		Map<String, String> config = new HashMap<String, String>();
 		config.put("proxy.interceptrequests", "false");
 		updateConfig(config);
@@ -168,7 +175,12 @@ public class BurpService implements IBurpService {
 			in = new FileInputStream(filename);
 			Properties props = new Properties();
 			props.load(in);
-			extender.getCallbacks().loadConfig(props);
+            Map<String,String> map = new HashMap<String,String>();
+            for (Object key : props.keySet()) {
+                String stringKey = (String)key;
+                map.put(stringKey,props.getProperty(stringKey));
+            }
+			extender.getCallbacks().loadConfig(map);
 			in.close();
 			log.debug("Config loaded from: " + filename);
 		} catch (Exception ex) {
