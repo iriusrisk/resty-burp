@@ -27,6 +27,7 @@ import burp.IHttpService;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -47,6 +48,19 @@ public class HttpMessage {
     private IHttpService httpService;
 
     public HttpMessage() {}
+    
+    public HttpMessage(HttpMessage msg) {
+    	host = msg.getHost();
+    	port = msg.getPort();
+    	protocol = msg.getProtocol();
+    	request = Arrays.copyOf(msg.getRequest(),msg.getRequest().length);
+    	response = Arrays.copyOf(msg.getResponse(),msg.getResponse().length);
+    	statusCode = msg.statusCode;
+    	comment = msg.getComment();
+    	highlight = msg.highlight;
+    	url = msg.getUrl();
+    	httpService = msg.httpService;
+    }
     
     public HttpMessage(IHttpRequestResponse ihrr) {
         host = ihrr.getHost();

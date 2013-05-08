@@ -345,10 +345,10 @@ public class BurpService implements IBurpService {
 	public static void main(String... args) {
 		OptionParser parser = new OptionParser();
 		parser.accepts("f").withOptionalArg().ofType(String.class);
-		parser.accepts("g");
+		parser.accepts("h");
 		OptionSet options = parser.parse(args);
 
-		if (options.has("g")) {
+		if (options.has("h")) {
 			headless = false;
 		}
 
